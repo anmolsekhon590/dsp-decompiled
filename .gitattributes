@@ -1,0 +1,30 @@
+# Default: treat as text with LF in repo (CRLF warnings on Windows extracts are fine)
+* text=auto eol=lf
+
+# Python / Markdown / docs — text
+*.py   text eol=lf
+*.md   text eol=lf
+*.txt  text eol=lf
+*.xaml text eol=lf
+
+# Binary artefacts — never diff/merge/normalize
+*.exe  binary
+*.dll  binary
+*.ico  binary
+*.bmp  binary
+*.png  binary
+*.pdf  binary
+*.cab  binary
+*.msi  binary
+
+# Raw PE section dumps (decompiled/pe_resources/.text .rdata .data .reloc) — binary
+decompiled/pe_resources/.text  binary
+decompiled/pe_resources/.rdata binary
+decompiled/pe_resources/.data  binary
+decompiled/pe_resources/.reloc binary
+
+# PE .rsrc dialog/resource blobs (extensionless) — binary
+decompiled/pe_resources/.rsrc/DIALOG/*    binary
+decompiled/pe_resources/.rsrc/GROUP_ICON/* binary
+decompiled/pe_resources/.rsrc/MANIFEST/*  binary
+decompiled/pe_resources/.rsrc/ICON/1      binary

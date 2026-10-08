@@ -1,0 +1,27 @@
+# Original installer — do not commit (commercial, © Neural DSP)
+Archetype Plini X v1.0.2.exe
+*.exe
+!decompiled/embedded/*.exe
+
+# Wine prefix (contains extracted installer artefacts + wine state)
+wine_prefix/
+
+# Extracted payload binaries & presets (commercial content)
+# Ignore everything under extracted_payload/ except the README + gitkeep.
+extracted_payload/*
+!extracted_payload/.gitkeep
+!extracted_payload/README.md
+
+# Ghidra project
+ghidra_proj/
+*.gpr
+*.rep/
+*.lock
+
+# Python
+__pycache__/
+*.pyc
+
+# Misc
+*.log
+.DS_Store

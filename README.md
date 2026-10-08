@@ -22,7 +22,7 @@ plugin binaries are characterised at a high level only.
 | What is the 314 MiB EXE? | An **Advanced Installer 20.9.1 SFX bootstrapper** (Caphyon) wrapping an LZMA-compressed MSI + CAB. |
 | How do I extract it? | `wine "Archetype Plini X v1.0.2.exe" /extract` dumps `Archetype Plini X.msi` + `Archetype Plini X1.cab`. |
 | What's inside? | 4 plugin binaries (standalone/VST2/VST3/AAX, x64, ~91 MiB each) + 189 preset XMLs + manual PDF. |
-| What framework? | **JUCE** + **Intel IPP** + **GRU neural nets** (RTNeural-style) for amp/cab modelling. |
+| What framework? | **JUCE** + **Intel IPP** + **GRU neural nets** (`EnergyNormNoBias` topology) for amp/cab modelling. |
 | DRM? | **PACE Anti-Piracy iLok** (InterLok). Model weights are encrypted, decrypted in memory at runtime. |
 | Compiler | MSVC 14.36 (stub) / MSVC (plugins), x86-64 for the plugins. |
 
@@ -116,8 +116,12 @@ The four plugin binaries are **native PE32+ x86-64** JUCE-based C++ with:
 
 - **Intel IPP** static-linked (`IPPCODE`/`IPPDATA` sections) for vectorised DSP.
 - **GRU recurrent neural networks** for amp & cabinet modelling
-  (3 amps: clean/crunch/lead; cab sim; 3 EQs; pedals: compressor/drive/
-  octaver/preDelay; FX: chorus/delay/reverb; tuner + metronome).
+  (3 poweramps: clean/crunch/lead; cab sim; 3 EQs; pedals: compressor/drive/
+  octaver/preDelay; FX: chorus/delay/reverb; tuner + metronome). The three
+  poweramps are registered as `Plini_{Clean,Crunch,Lead}EnergyNormNoBias_Poweramp_Processor_GRU` —
+  a **GRU** core with **EnergyNorm** (input energy-normalisation, making the
+  model gain-independent) and **NoBias** (gate biases dropped). Architecture only;
+  weights are PACE-encrypted (see PROGRESS §5b).
 - **PACE/iLok** DRM: the `.proxy` section embeds the PACE license-proxy PE;
   the `.guard` section holds obfuscated/anti-tamper code; model weights live
   in an 80 MB virtual `.mfrt` region that is **decrypted at runtime** by the

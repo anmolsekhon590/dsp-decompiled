@@ -224,10 +224,26 @@ string table** (adjacent to `Fixed Tube Processor`, `gain_processor`,
 `TST01 Processor`) — they are RTTI/registration names, **not** weight blobs.
 
 **Architecture IS recoverable** (plaintext in `.rdata`):
-- 3 GRU poweramp models (EnergyNormNoBias topology — energy-normalised, no bias term)
+- 3 GRU poweramp models (EnergyNormNoBias topology — see topology notes below)
 - 3 preamp processors (clean/crunch/lead) + `fixed_tube_processor`
 - Cab sim (IR-based), pedals (comp/dist/mod/stomp_delay), FX (Chorus 2290, Reverb, FDN)
 - Full MVC model XML hierarchy (`archetypeAppModel.xml` → `*ParametersModel.xml`)
+
+**Inferred GRU topology** (from the `Plini_*EnergyNormNoBias_Poweramp_Processor_GRU`
+registry names — a naming convention, not weight data):
+- **GRU** = gated recurrent unit (3 gates: reset/update/candidate, vs an LSTM's 4).
+- **EnergyNorm** = input is normalised by its energy before the recurrent core, a
+  known technique to make a recurrent amp model gain-independent / output-stable
+  across input levels. Equivalent function to NAM's per-file `metadata.loudness` /
+  `input_level_dbu`, but applied *inside* the network rather than as file metadata.
+- **NoBias** = the bias terms on the GRU gates are dropped, reducing parameters and
+  regularising the model.
+
+The internal weight layout is therefore almost certainly the standard recurrent
+-model pattern — a flat `float32` array consumed in order as
+`[W_gru (3 gates × (in+hidden)), initial_hidden, head_W, (head_b)]`, with the bias
+slot omitted per the `NoBias` suffix. (We document the *shape* only; the actual
+values are not recovered — see below.)
 
 **Weights are NOT recoverable** — they are PACE/iLok-encrypted in `.guard`/`.data`,
 decrypted at runtime into the virtual `.mfrt` region. Extraction would require
